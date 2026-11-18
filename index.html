@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#171329">
+  <title>NARU STORES — Share • Like • Shop</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand-mark">N</div>
+      <p class="eyebrow">YOUR COMMUNITY MARKETPLACE</p>
+      <h1>NARU <span>STORES</span></h1>
+      <p class="muted">Discover products. Share what you sell.</p>
+      <div class="tabs">
+        <button class="tab active" data-tab="login">Log in</button>
+        <button class="tab" data-tab="signup">Create account</button>
+      </div>
+      <form id="authForm">
+        <label>Email address<input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+        <label>Password<input id="password" type="password" minlength="6" required placeholder="At least 6 characters"></label>
+        <button class="primary full" id="authSubmit">Log in</button>
+      </form>
+      <p id="authMessage" class="message" aria-live="polite"></p>
+      <p class="tiny muted">You must sign in before viewing the marketplace.</p>
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Naru Stores home"><span class="brand-mark small">N</span><span>NARU <b>STORES</b></span></a>
+      <div class="top-actions"><span id="userEmail" class="user-email"></span><button id="logoutBtn" class="outline">Log out</button></div>
+    </header>
+    <nav class="nav">
+      <button class="nav-btn active" data-page="home">Home</button>
+      <button class="nav-btn" data-page="upload">Sell a product</button>
+      <button class="nav-btn" data-page="mine">My products</button>
+      <button class="nav-btn" data-page="wallet">Airtime rewards</button>
+    </nav>
+
+    <main>
+      <section id="page-home" class="page">
+        <div class="hero">
+          <div><p class="eyebrow">WELCOME TO THE MARKETPLACE</p><h2>Find something<br><span>you love.</span></h2><p>Browse products shared by the Naru Stores community.</p></div>
+          <div class="hero-icon">✦</div>
+        </div>
+        <div class="section-heading"><div><p class="eyebrow">COMMUNITY MARKET</p><h2>Explore products</h2></div><button id="refreshBtn" class="outline">Refresh</button></div>
+        <div id="productGrid" class="product-grid"></div>
+        <p id="emptyProducts" class="empty hidden">No products have been shared yet. Be the first to upload one.</p>
+      </section>
+
+      <section id="page-upload" class="page hidden">
+        <div class="section-heading"><div><p class="eyebrow">START SELLING</p><h2>Share a product</h2><p class="muted">Add clear details so people know what you offer.</p></div></div>
+        <form id="productForm" class="form-card">
+          <label>Product name<input id="productName" maxlength="90" required placeholder="e.g. Wireless headphones"></label>
+          <label>Price / asking price<input id="productPrice" maxlength="40" required placeholder="e.g. $15 or Contact me"></label>
+          <label>Description<textarea id="productDescription" maxlength="1000" rows="4" required placeholder="Describe your product..."></textarea></label>
+          <label>Product photo<input id="productImage" type="file" accept="image/*" required></label>
+          <button class="primary" type="submit">Publish product</button>
+          <p id="uploadMessage" class="message"></p>
+        </form>
+      </section>
+
+      <section id="page-mine" class="page hidden">
+        <div class="section-heading"><div><p class="eyebrow">YOUR SHOP</p><h2>My products</h2></div></div>
+        <div id="myProducts" class="product-grid"></div>
+        <p id="emptyMine" class="empty hidden">You have not uploaded any products yet.</p>
+      </section>
+
+      <section id="page-wallet" class="page hidden">
+        <div class="section-heading"><div><p class="eyebrow">REWARDS CENTRE</p><h2>Airtime rewards</h2><p class="muted">Choose Econet or NetOne for a withdrawal request.</p></div></div>
+        <div class="wallet-card"><p class="muted">Available reward balance</p><div class="balance" id="balance">$0.00</div><p class="tiny">Reward rate: $1.00 airtime for each verified unique product like.</p></div>
+        <form id="withdrawForm" class="form-card">
+          <h3>Request airtime</h3>
+          <label>Network<select id="network" required><option value="Econet">Econet</option><option value="NetOne">NetOne</option></select></label>
+          <label>Phone number<input id="phone" type="tel" required maxlength="20" placeholder="Enter the number to receive airtime"></label>
+          <label>Amount (USD)<input id="withdrawAmount" type="number" min="1" step="1" required value="1"></label>
+          <button class="primary" type="submit">Submit withdrawal request</button>
+          <p id="withdrawMessage" class="message"></p>
+          <p class="tiny muted">Important: submitting a request does not send airtime automatically. Requests are recorded for fulfilment by the site operator. Automatic Econet/NetOne delivery requires an authorized airtime API/provider and funded account.</p>
+        </form>
+        <div class="section-heading compact"><h3>My withdrawal requests</h3></div>
+        <div id="withdrawals" class="request-list"></div>
+      </section>
+    </main>
+    <footer>© <span id="year"></span> NARU STORES · Share • Like • Shop</footer>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
