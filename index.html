@@ -1,137 +1,177 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#7156d9">
   <title>NARU STORES</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="app.js"></script>
 </head>
-<body>
-
-  <section id="authScreen" class="auth-screen">
+<body><header class="topbar">
+  <a class="brand" href="#">NARU <span>STORES</span></a>
+  <div class="account">
+    <span id="userEmail"></span>
+    <button id="logoutBtn" class="small-btn hidden">Logout</button>
+  </div>
+</header><main>
+  <!-- AUTHENTICATION -->
+  <section id="authScreen" class="auth-wrap">
     <div class="auth-card">
-      <div class="brand-mark">N</div>
-      <h1>NARU STORES</h1>
-      <p class="muted">Discover. Share. Shop.</p>
-
-      <div class="tabs">
-        <button type="button" class="tab active" data-tab="login">Login</button>
-        <button type="button" class="tab" data-tab="signup">Sign up</button>
-      </div>
-
-      <form id="authForm">
-        <label>Email address</label>
-        <input id="email" type="email" placeholder="Enter your email" required>
-
-        <label>Password</label>
-        <input id="password" type="password" placeholder="Enter your password" minlength="6" required>
-
-        <button id="authSubmit" class="primary-btn" type="submit">Login</button>
-        <p id="authMessage" class="message"></p>
-      </form>
-    </div>
-  </section>
-
-  <div id="app" class="hidden">
-    <header class="topbar">
-      <a class="logo" href="#" data-page="home">NARU <span>STORES</span></a>
-      <div class="user-area">
-        <span id="userEmail"></span>
-        <button id="logoutBtn" class="small-btn" type="button">Logout</button>
-      </div>
-    </header>
-
-    <nav class="nav">
-      <button data-page="home" class="nav-btn active">Home</button>
-      <button data-page="upload" class="nav-btn">Sell</button>
-      <button data-page="mine" class="nav-btn">My products</button>
-      <button data-page="wallet" class="nav-btn">Wallet</button>
-    </nav>
-
-    <main>
-      <section id="page-home" class="page">
-        <div class="hero">
-          <p class="eyebrow">WELCOME TO</p>
-          <h1>NARU STORES</h1>
-          <p>Discover products and share what you have to offer.</p>
-          <button id="refreshBtn" class="hero-btn" type="button">Refresh products</button>
-        </div>
-
-        <h2>Marketplace</h2>
-        <div id="productGrid" class="product-grid"></div>
-        <p id="emptyProducts" class="empty hidden">No products have been published yet.</p>
-      </section>
-
-      <section id="page-upload" class="page hidden">
-        <div class="panel">
-          <h2>Publish a product</h2>
-          <p class="muted">Add product details and attach a file or image.</p>
-
-          <form id="productForm">
-            <label>Product name</label>
-            <input id="productName" type="text" maxlength="100" required>
-
-            <label>Price</label>
-            <input id="productPrice" type="text" maxlength="50" placeholder="$15 or Contact me" required>
-
-            <label>Description</label>
-            <textarea id="productDescription" maxlength="2000" rows="4" required></textarea>
-
-            <label>Product image or file</label>
-            <input id="productImage" type="file" accept="*/*" required>
-            <p class="hint">Maximum file size: 50 MB.</p>
-
-            <button class="primary-btn" type="submit">Publish product</button>
-            <p id="uploadMessage" class="message"></p>
-          </form>
-        </div>
-      </section>
-
-      <section id="page-mine" class="page hidden">
-        <h2>My products</h2>
-        <div id="myProducts" class="product-grid"></div>
-        <p id="emptyMine" class="empty hidden">You have not published any products yet.</p>
-      </section>
-
-      <section id="page-wallet" class="page hidden">
-        <div class="wallet-card">
-          <p>Available balance</p>
-          <h1 id="balance">$0.00</h1>
-          <p class="hint">Only verified rewards can be withdrawn.</p>
-        </div>
-
-        <div class="panel">
-          <h2>Request airtime withdrawal</h2>
-          <form id="withdrawForm">
-            <label>Mobile network</label>
-            <select id="network" required>
-              <option value="Econet">Econet</option>
-              <option value="NetOne">NetOne</option>
-            </select>
-
-            <label>Phone number</label>
-            <input id="phone" type="tel" placeholder="Enter phone number" required>
-
-            <label>Amount</label>
-            <input id="withdrawAmount" type="number" min="1" step="0.01" required>
-
-            <button class="primary-btn" type="submit">Request withdrawal</button>
-            <p id="withdrawMessage" class="message"></p>
-          </form>
-        </div>
-
-        <div class="panel">
-          <h2>Withdrawal history</h2>
-          <div id="withdrawals"></div>
-        </div>
-      </section>
-    </main>
-
-    <footer>© <span id="year"></span> NARU STORES · Share • Like • Shop</footer>
+      <div class="logo-circle">N</div>
+      <h1>Welcome to NARU STORES</h1>
+      <p class="muted">Discover, share and download files.</p>  <div class="tabs">
+    <button type="button" data-tab="login" class="active">Login</button>
+    <button type="button" data-tab="signup">Create account</button>
   </div>
 
-  <div id="toast" class="toast hidden"></div>
-  <script src="app.js"></script>
-</body>
+  <form id="authForm">
+    <label>Email address</label>
+    <input id="email" type="email" placeholder="Enter your email" required>
+    <label>Password</label>
+    <input id="password" type="password" minlength="6"
+      placeholder="At least 6 characters" required>
+    <button id="authSubmit" class="primary-btn" type="submit">Login</button>
+    <p id="authMessage" class="message"></p>
+  </form>
+</div>
+
+  </section>  <!-- MAIN APP -->  <div id="app" class="hidden">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">WELCOME TO YOUR MARKETPLACE</p>
+        <h1>Share. Like. <span>Shop.</span></h1>
+        <p>Upload your files, discover other uploads and earn rewards for eligible likes.</p>
+      </div>
+    </section><nav class="navigation">
+  <button type="button" data-page="home" class="active">Home</button>
+  <button type="button" data-page="upload">Upload</button>
+  <button type="button" data-page="mine">My uploads</button>
+  <button type="button" data-page="wallet">Wallet</button>
+  <button type="button" data-page="admin" id="adminNav" class="hidden">Admin</button>
+</nav>
+
+<!-- HOME -->
+<section id="page-home" class="page">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">EXPLORE</p>
+      <h2>Marketplace</h2>
+    </div>
+    <button type="button" class="outline-btn" id="refreshProducts">Refresh</button>
+  </div>
+  <div id="products" class="product-grid">
+    <p>Loading marketplace...</p>
+  </div>
+</section>
+
+<!-- UPLOAD -->
+<section id="page-upload" class="page hidden">
+  <div class="panel form-panel">
+    <p class="eyebrow">SHARE WITH EVERYONE</p>
+    <h2>Publish a product</h2>
+    <form id="uploadForm">
+      <label>Product name</label>
+      <input id="productName" type="text" maxlength="100"
+        placeholder="Enter a name" required>
+
+      <label>Price (optional)</label>
+      <input id="productPrice" type="text" maxlength="30"
+        placeholder="Free or enter a price">
+
+      <label>Description</label>
+      <textarea id="productDescription" rows="4"
+        maxlength="1000" placeholder="Describe your upload"></textarea>
+
+      <label>Select image, video or file</label>
+      <input id="productImage" type="file" required>
+      <small>Maximum file size: 50 MB.</small>
+
+      <button class="primary-btn" type="submit">Publish product</button>
+      <p id="uploadMessage" class="message"></p>
+    </form>
+  </div>
+</section>
+
+<!-- MY UPLOADS -->
+<section id="page-mine" class="page hidden">
+  <div class="section-heading">
+    <h2>My uploads</h2>
+    <button type="button" class="outline-btn" id="refreshMine">Refresh</button>
+  </div>
+  <div id="myProducts" class="product-grid"></div>
+</section>
+
+<!-- WALLET -->
+<section id="page-wallet" class="page hidden">
+  <div class="wallet-card">
+    <p>Available wallet balance</p>
+    <h1 id="balance">$0.00</h1>
+    <p class="wallet-note">Only approved rewards are available to withdraw.</p>
+  </div>
+
+  <div class="panel">
+    <h2>My rewards</h2>
+    <div id="myRewards">Loading rewards...</div>
+  </div>
+
+  <div class="panel form-panel">
+    <h2>Withdraw airtime</h2>
+    <p class="muted">Requests are recorded automatically. Airtime is sent manually.</p>
+
+    <form id="withdrawForm">
+      <label>Mobile network</label>
+      <select id="network" required>
+        <option value="">Choose network</option>
+        <option value="Econet">Econet</option>
+        <option value="NetOne">NetOne</option>
+      </select>
+
+      <label>Phone number</label>
+      <input id="phone" type="tel" placeholder="Enter phone number" required>
+
+      <label>Amount in USD</label>
+      <input id="withdrawAmount" type="number" min="1"
+        step="0.01" placeholder="Enter amount" required>
+
+      <button class="primary-btn" type="submit">Withdraw Airtime</button>
+      <p id="withdrawMessage" class="message"></p>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Withdrawal history</h2>
+    <div id="withdrawals">Loading requests...</div>
+  </div>
+
+  <div class="panel">
+    <h2>Wallet transactions</h2>
+    <div id="transactions">Loading transactions...</div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section id="page-admin" class="page hidden">
+  <div class="panel">
+    <p class="eyebrow">CONTROL CENTRE</p>
+    <h2>Admin dashboard</h2>
+    <p class="muted">Review rewards and manage manual airtime requests.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Pending like rewards</h2>
+    <div id="adminRewards">Loading...</div>
+  </div>
+
+  <div class="panel">
+    <h2>Pending airtime requests</h2>
+    <p class="muted">Send airtime first, then mark the request as paid.</p>
+    <div id="adminWithdrawals">Loading...</div>
+  </div>
+</section>
+
+  </div>
+</main><footer>
+  <p>© <span id="year"></span> NARU STORES · Share • Like • Shop</p>
+</footer><div id="toast" class="toast"></div></body>
 </html>
