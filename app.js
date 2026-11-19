@@ -1,10 +1,11 @@
 
 /* ==========================================
-   NARU STORES - UPDATED APP.JS
-   Wallet, Rewards, Products, Likes, Downloads
+   NARU STORES - COMPLETE APP.JS
+   Updated Wallet + Rewards System
    ========================================== */
 
-const SUPABASE_URL = "https://fsrosklmmmfprpczmdyr.supabase.co";
+const SUPABASE_URL =
+  "https://fsrosklmmmfprpczmdyr.supabase.co";
 
 const SUPABASE_KEY =
   "sb_publishable_KfHVYeZwnFSIy_fUpTN7zg_NajdmGNm";
@@ -15,7 +16,6 @@ const db = window.supabase.createClient(
 );
 
 const BUCKET = "product-files";
-const REWARD_PER_LIKE = 1;
 
 let currentUser = null;
 let products = [];
@@ -30,7 +30,11 @@ const el = id => document.getElementById(id);
 
 function showToast(message) {
   const toast = el("toast");
-  if (!toast) return;
+
+  if (!toast) {
+    console.log(message);
+    return;
+  }
 
   toast.textContent = message;
   toast.style.display = "block";
@@ -70,8 +74,11 @@ async function checkLogin() {
     currentUser = data.session.user;
     await startApp();
   } else {
-    if (el("authScreen")) el("authScreen").style.display = "block";
-    if (el("app")) el("app").style.display = "none";
+    if (el("authScreen"))
+      el("authScreen").style.display = "block";
+
+    if (el("app"))
+      el("app").style.display = "none";
   }
 }
 
@@ -86,13 +93,17 @@ async function authenticate(event) {
   }
 
   const button = el("authSubmit");
+
   if (button) button.disabled = true;
 
   try {
     let result;
 
     if (window.authMode === "signup") {
-      result = await db.auth.signUp({ email, password });
+      result = await db.auth.signUp({
+        email,
+        password
+      });
     } else {
       result = await db.auth.signInWithPassword({
         email,
@@ -102,15 +113,13 @@ async function authenticate(event) {
 
     if (result.error) throw result.error;
 
-    if (result.data.user) {
+    if (result.data.session) {
       currentUser = result.data.user;
-
-      if (result.data.session) {
-        await startApp();
-      } else {
-        showToast("Check your email to confirm registration.");
-      }
+      await startApp();
+    } else {
+      showToast("Check your email to confirm registration.");
     }
+
   } catch (error) {
     showToast(error.message);
   } finally {
@@ -145,16 +154,17 @@ async function logout() {
 async function startApp() {
   if (!currentUser) return;
 
-  if (el("authScreen")) el("authScreen").style.display = "none";
-  if (el("app")) el("app").style.display = "block";
+  if (el("authScreen"))
+    el("authScreen").style.display = "none";
 
-  if (el("userEmail")) {
+  if (el("app"))
+    el("app").style.display = "block";
+
+  if (el("userEmail"))
     el("userEmail").textContent = currentUser.email;
-  }
 
-  if (el("year")) {
+  if (el("year"))
     el("year").textContent = new Date().getFullYear();
-  }
 
   await Promise.all([
     loadStoreFiles(),
@@ -165,18 +175,24 @@ async function startApp() {
 }
 
 /* ==========================================
-   PRODUCT UPLOADS
+   PRODUCT UPLOAD
    ========================================== */
 
 async function uploadStoreFile(file, description = "") {
-  if (!currentUser) throw new Error("Please login first.");
-  if (!file) throw new Error("Choose a file.");
+  if (!currentUser)
+    throw new Error("Please login first.");
 
-  if (file.size > 50 * 1024 * 1024) {
+  if (!file)
+    throw new Error("Choose a file.");
+
+  if (file.size > 50 * 1024 * 1024)
     throw new Error("Maximum file size is 50 MB.");
-  }
 
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const safeName = file.name.replace(
+    /[^a-zA-Z0-9._-]/g,
+    "_"
+  );
+
   const filePath =
     `${currentUser.id}/${Date.now()}_${safeName}`;
 
@@ -194,7 +210,7 @@ async function uploadStoreFile(file, description = "") {
     .insert({
       user_id: currentUser.id,
       name: file.name,
-      price: 0,
+      price: "0",
       description,
       file_path: filePath,
       file_name: file.name,
@@ -218,17 +234,19 @@ async function publishProduct(event) {
 
   const file = el("productImage")?.files?.[0];
   const name = el("productName")?.value.trim();
-  const price = Number(el("productPrice")?.value || 0);
-  const description = el("productDescription")?.value.trim() || "";
+  const price = el("productPrice")?.value || "0";
+  const description =
+    el("productDescription")?.value.trim() || "";
 
-  if (!name) return showToast("Enter a product name.");
-  if (!file) return showToast("Choose a product file.");
-  if (!Number.isFinite(price) || price < 0) {
-    return showToast("Enter a valid price.");
-  }
+  if (!name)
+    return showToast("Enter a product name.");
+
+  if (!file)
+    return showToast("Choose a product file.");
 
   try {
     const button = el("publishButton");
+
     if (button) button.disabled = true;
 
     await uploadStoreFile(file, description);
@@ -241,23 +259,24 @@ async function publishProduct(event) {
       loadStoreFiles(),
       loadMyProducts()
     ]);
+
   } catch (error) {
     showToast(error.message);
   } finally {
-    if (el("publishButton")) {
+    if (el("publishButton"))
       el("publishButton").disabled = false;
-    }
   }
 }
 
 /* ==========================================
-   LOAD MARKETPLACE
+   LOAD PRODUCTS
    ========================================== */
 
 async function loadStoreFiles() {
   const { data, error } = await db
     .from("products")
     .select("*")
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -271,6 +290,7 @@ async function loadStoreFiles() {
 
 function renderProducts() {
   const grid = el("productGrid");
+
   if (!grid) return;
 
   if (!products.length) {
@@ -280,13 +300,21 @@ function renderProducts() {
 
   grid.innerHTML = products.map(product => `
     <article class="product-card">
+
+      ${product.image_url ? `
+        <img
+          src="${escapeHTML(product.image_url)}"
+          alt="${escapeHTML(product.name)}"
+        >
+      ` : ""}
+
       <h3>${escapeHTML(product.name)}</h3>
 
       <p>${escapeHTML(product.description || "")}</p>
 
       <p>${money(product.price)}</p>
 
-      <p>${Number(product.likes_count || 0)} Likes</p>
+      <p>${Number(product.likes_count || product.like_count || 0)} Likes</p>
 
       <button data-like="${escapeHTML(product.id)}">
         Like
@@ -295,18 +323,18 @@ function renderProducts() {
       <button data-download="${escapeHTML(product.id)}">
         Download
       </button>
+
     </article>
   `).join("");
 }
 
 /* ==========================================
-   LIKE SYSTEM AND REWARDS
+   LIKE SYSTEM
    ========================================== */
 
 async function likeStoreFile(productId) {
-  if (!currentUser) {
+  if (!currentUser)
     return showToast("Please login first.");
-  }
 
   try {
     const { error } = await db.rpc("like_product", {
@@ -348,13 +376,15 @@ async function loadMyProducts() {
   myProducts = data || [];
 
   if (el("myProducts")) {
-    el("myProducts").innerHTML = myProducts.map(product => `
-      <div class="product-card">
-        <h3>${escapeHTML(product.name)}</h3>
-        <p>${escapeHTML(product.description || "")}</p>
-        <p>${money(product.price)}</p>
-      </div>
-    `).join("") || "<p>You have not published any products.</p>";
+    el("myProducts").innerHTML =
+      myProducts.map(product => `
+        <div class="product-card">
+          <h3>${escapeHTML(product.name)}</h3>
+          <p>${escapeHTML(product.description || "")}</p>
+          <p>${money(product.price)}</p>
+        </div>
+      `).join("") ||
+      "<p>You have not published any products.</p>";
   }
 }
 
@@ -363,9 +393,15 @@ async function loadMyProducts() {
    ========================================== */
 
 async function downloadStoreFile(productId) {
-  const product = products.find(p => p.id === productId);
+  const product = products.find(
+    p => p.id === productId
+  );
 
-  if (!product) return showToast("Product not found.");
+  if (!product)
+    return showToast("Product not found.");
+
+  if (!product.file_path)
+    return showToast("This product has no downloadable file.");
 
   try {
     const { data, error } = await db.storage
@@ -392,7 +428,7 @@ async function downloadStoreFile(productId) {
 }
 
 /* ==========================================
-   REWARDS AND WALLET
+   REWARDS
    ========================================== */
 
 async function loadRewards() {
@@ -401,7 +437,8 @@ async function loadRewards() {
   const { data, error } = await db
     .from("like_rewards")
     .select("id,amount,status,product_id")
-    .eq("user_id", currentUser.id);
+    .eq("creator_id", currentUser.id)
+    .order("created_at", { ascending: false });
 
   if (error) {
     showToast("Could not load rewards: " + error.message);
@@ -412,39 +449,49 @@ async function loadRewards() {
 
   const pending = rewards
     .filter(r => r.status === "pending")
-    .reduce((sum, r) => sum + Number(r.amount || 0), 0);
+    .reduce(
+      (sum, r) => sum + Number(r.amount || 0),
+      0
+    );
 
   const approved = rewards
     .filter(r => r.status === "approved")
-    .reduce((sum, r) => sum + Number(r.amount || 0), 0);
+    .reduce(
+      (sum, r) => sum + Number(r.amount || 0),
+      0
+    );
 
-  const pendingElement = el("pendingRewards");
-  const approvedElement = el("approvedRewards");
+  if (el("pendingRewards"))
+    el("pendingRewards").textContent = money(pending);
 
-  if (pendingElement) pendingElement.textContent = money(pending);
-  if (approvedElement) approvedElement.textContent = money(approved);
+  if (el("approvedRewards"))
+    el("approvedRewards").textContent = money(approved);
 
-  const rewardsContainer = el("rewardsList");
-
-  if (rewardsContainer) {
-    rewardsContainer.innerHTML = rewards.map(r => `
-      <div class="reward-item">
-        <strong>${money(r.amount)}</strong>
-        <span>${escapeHTML(r.status)}</span>
-        <small>Product: ${escapeHTML(r.product_id)}</small>
-      </div>
-    `).join("") || "<p>No rewards yet.</p>";
+  if (el("rewardsList")) {
+    el("rewardsList").innerHTML =
+      rewards.map(r => `
+        <div class="reward-item">
+          <strong>${money(r.amount)}</strong>
+          <span>${escapeHTML(r.status)}</span>
+          <small>
+            Product: ${escapeHTML(r.product_id)}
+          </small>
+        </div>
+      `).join("") ||
+      "<p>No rewards yet.</p>";
   }
 
   return approved;
 }
 
+/* ==========================================
+   UPDATED WALLET FUNCTION
+   ========================================== */
+
 async function refreshWallet() {
   if (!currentUser) return;
 
   try {
-    const approved = await loadRewards();
-
     const { data: wallet, error } = await db
       .from("wallets")
       .select("balance")
@@ -453,25 +500,23 @@ async function refreshWallet() {
 
     if (error) throw error;
 
-    // The database wallet remains authoritative for withdrawals.
-    // Approved rewards are shown separately until credited server-side.
-    const databaseBalance = Number(wallet?.balance || 0);
+    const balance = Number(wallet?.balance || 0);
 
     if (el("balance")) {
-      el("balance").textContent = money(databaseBalance);
+      el("balance").textContent =
+        "$" + balance.toFixed(2);
     }
 
-    if (el("approvedRewards")) {
-      el("approvedRewards").textContent = money(approved);
-    }
+    await loadRewards();
 
   } catch (error) {
-    showToast("Wallet error: " + error.message);
+    console.error("Wallet error:", error);
+    showToast("Could not load wallet balance.");
   }
 }
 
 /* ==========================================
-   AIRTIME WITHDRAWALS
+   WITHDRAWALS
    ========================================== */
 
 async function withdrawStoreMoney(event) {
@@ -483,22 +528,24 @@ async function withdrawStoreMoney(event) {
   const phone = el("phone")?.value.trim();
   const network = el("network")?.value;
 
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return showToast("Enter a valid withdrawal amount.");
-  }
+  if (!Number.isFinite(amount) || amount <= 0)
+    return showToast("Enter a valid amount.");
 
-  if (!phone) return showToast("Enter your phone number.");
+  if (!phone)
+    return showToast("Enter your phone number.");
 
-  if (!["Econet", "NetOne"].includes(network)) {
+  if (!["Econet", "NetOne"].includes(network))
     return showToast("Choose Econet or NetOne.");
-  }
 
   try {
-    const { data, error } = await db.rpc("request_withdrawal", {
-      p_amount: amount,
-      p_phone: phone,
-      p_network: network
-    });
+    const { data, error } = await db.rpc(
+      "request_withdrawal",
+      {
+        p_amount: amount,
+        p_phone: phone,
+        p_network: network
+      }
+    );
 
     if (error) throw error;
 
@@ -535,14 +582,16 @@ async function loadWithdrawalHistory() {
   }
 
   if (el("withdrawals")) {
-    el("withdrawals").innerHTML = (data || []).map(w => `
-      <div class="withdrawal-item">
-        <strong>${money(w.amount)}</strong>
-        <p>${escapeHTML(w.network || "")}</p>
-        <p>${escapeHTML(w.phone || "")}</p>
-        <span>${escapeHTML(w.status || "pending")}</span>
-      </div>
-    `).join("") || "<p>No withdrawals yet.</p>";
+    el("withdrawals").innerHTML =
+      (data || []).map(w => `
+        <div class="withdrawal-item">
+          <strong>${money(w.amount)}</strong>
+          <p>${escapeHTML(w.network)}</p>
+          <p>${escapeHTML(w.phone_number)}</p>
+          <span>${escapeHTML(w.status)}</span>
+        </div>
+      `).join("") ||
+      "<p>No withdrawals yet.</p>";
   }
 }
 
@@ -562,9 +611,16 @@ function showPage(page) {
    ========================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
-  el("authForm")?.addEventListener("submit", authenticate);
 
-  el("productForm")?.addEventListener("submit", publishProduct);
+  el("authForm")?.addEventListener(
+    "submit",
+    authenticate
+  );
+
+  el("productForm")?.addEventListener(
+    "submit",
+    publishProduct
+  );
 
   el("withdrawForm")?.addEventListener(
     "submit",
@@ -580,6 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("click", event => {
+
     const likeButton = event.target.closest("[data-like]");
     const downloadButton = event.target.closest("[data-download]");
 
@@ -592,7 +649,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const nav = event.target.closest("[data-nav]");
-    if (nav) showPage(nav.dataset.nav);
+
+    if (nav) {
+      showPage(nav.dataset.nav);
+    }
   });
 
   db.auth.onAuthStateChange((event, session) => {
